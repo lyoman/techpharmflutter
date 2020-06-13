@@ -25,18 +25,22 @@ class MedDetail extends StatelessWidget {
         ),
         padding: EdgeInsets.all(16.0),
         child: Card(
-                child: Column(
+                child: Row(
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.settings, color: Colors.deepPurpleAccent,),
-                      title: Text(user.pharmacy_name),
-                      subtitle: Text(user.city),
+                      title: Text(user.productprice),
+                      subtitle: Text(user.product_name),
                     ),
-                    Text(user.product_name),
-                    Text(user.productprice),
-                    Text(user.address),
-                    Text(user.location),
+                    Column(
+                      children: <Widget>[
+                        Row (
+         
+                        ),
+                      ],
+                    ),
                   ],
+                  
                 ),
               ),
         

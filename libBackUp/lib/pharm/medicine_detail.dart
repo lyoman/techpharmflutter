@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:prueleo/search/medicine.dart';
+import '../tabs/medicine_list.dart';
 
 
-class MedDetail extends StatelessWidget {
-  final Product user;
+class MedDetailScreen extends StatelessWidget {
+  final Medicine user;
 
-  MedDetail(this.user);
+  MedDetailScreen(this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -25,18 +25,22 @@ class MedDetail extends StatelessWidget {
         ),
         padding: EdgeInsets.all(16.0),
         child: Card(
-                child: Column(
+                child: Row(
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.settings, color: Colors.deepPurpleAccent,),
-                      title: Text(user.pharmacy_name),
-                      subtitle: Text(user.city),
+                      title: Text(user.productprice),
+                      subtitle: Text(user.product_name),
                     ),
-                    Text(user.product_name),
-                    Text(user.productprice),
-                    Text(user.address),
-                    Text(user.location),
+                    Column(
+                      children: <Widget>[
+                        Row (
+         
+                        ),
+                      ],
+                    ),
                   ],
+                  
                 ),
               ),
         

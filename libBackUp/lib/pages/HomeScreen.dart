@@ -2,28 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-// import '../pharm/map_page.dart';
+import 'package:prueleo/tabs/pharmacies_list.dart';
+// import 'package:prueleo/tabs/medicine_list.dart';
+import 'package:prueleo/tabs/healthtips_list.dart';
+import '../pharm/map_page.dart';
 
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:prueleo/models/pharmacy_model.dart';
 
 import 'package:prueleo/search/medicine.dart';
-import 'package:prueleo/searchpharmacy/pharmacy.dart';
-import 'package:prueleo/searchealthtips/healthtips.dart';
 import 'package:prueleo/search/netwoklayer.dart';
-import 'package:prueleo/searchpharmacy/pharmnetwoklayer.dart';
-import 'package:prueleo/searchealthtips/tipnetwoklayer.dart';
+import 'package:prueleo/search/medetail.dart';
 import 'package:prueleo/search/list.dart';
-import 'package:prueleo/searchpharmacy/listpharmacy.dart';
-import 'package:prueleo/searchealthtips/listtips.dart';
-
-import 'package:prueleo/searchpharmacy/pharmmap.dart';
-
-// import 'package:prueleo/tabs/pharmacies_list.dart';
-// import 'package:prueleo/tabs/healthtips_list.dart';
-// import 'package:prueleo/search/medetail.dart';
-// import 'package:prueleo/tabs/medicine_list.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -42,8 +34,6 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isSearching = false;
 
   List<Product> filteredRecored;
-  List<Pharmacy> filteredPharmacy;
-  List<TipCategory> filteredCategory;
 
   @override
   void initState() {
@@ -52,18 +42,10 @@ class _HomeScreenState extends State<HomeScreen>
     fetchProduct(new http.Client()).then((String) {
       parseData(String);
     });
-    fetchPharmacy(new http.Client()).then((String) {
-      parsePharmData(String);
-    });
-    fetchCategory(new http.Client()).then((String) {
-      parseTipData(String);
-    });
     controller = TabController(length: 3, vsync: this);
   }
 
   List<Product> allRecord;
-  List<Pharmacy> allPharmacies;
-  List<TipCategory> allCategories;
 
   parseData(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
@@ -73,28 +55,6 @@ class _HomeScreenState extends State<HomeScreen>
     });
     filteredRecored = new List<Product>();
     filteredRecored.addAll(allRecord);
-  }
-
-  parsePharmData(String responseBody) {
-    final parsed = json.decode(responseBody)['results'].cast<Map<String, dynamic>>();
-    // print(parsed);
-    setState(() {
-      allPharmacies =
-          parsed.map<Pharmacy>((json) => new Pharmacy.fromJson(json)).toList();
-    });
-    filteredPharmacy = new List<Pharmacy>();
-    filteredPharmacy.addAll(allPharmacies);
-  }
-
-  parseTipData(String responseBody) {
-    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    // print(parsed);
-    setState(() {
-      allCategories =
-          parsed.map<TipCategory>((json) => new TipCategory.fromJson(json)).toList();
-    });
-    filteredCategory = new List<TipCategory>();
-    filteredCategory.addAll(allCategories);
   }
 
   void _startSearch() {
@@ -113,8 +73,6 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _isSearching = false;
       filteredRecored.addAll(allRecord);
-      filteredPharmacy.addAll(allPharmacies);
-      filteredCategory.addAll(allCategories);
     });
   }
 
@@ -161,44 +119,16 @@ class _HomeScreenState extends State<HomeScreen>
 
   void updateSearchQuery(String newQuery) {
     filteredRecored.clear();
-    filteredPharmacy.clear();
-    filteredCategory.clear();
     if (newQuery.length > 0) {
       Set<Product> set = Set.from(allRecord);
       set.forEach((element) => filterList(element, newQuery));
-
-      Set<Pharmacy> set1 = Set.from(allPharmacies);
-      set1.forEach((pharmelement) => filterPharmacyList(pharmelement, newQuery));
-
-      Set<TipCategory> set2 = Set.from(allCategories);
-      set2.forEach((categoryelement) => filterCategoryList(categoryelement, newQuery));
     }
 
     if (newQuery.isEmpty) {
       filteredRecored.addAll(allRecord);
-      filteredPharmacy.addAll(allPharmacies);
-      filteredCategory.addAll(allCategories);
     }
 
     setState(() {});
-  }
-
-  filterCategoryList(TipCategory category, String searchQuery) {
-    setState(() {
-      if (category.name.toLowerCase().contains(searchQuery) ||
-          category.name.contains(searchQuery)) {
-        filteredCategory.add(category);
-      }
-    });
-  }
-
-  filterPharmacyList(Pharmacy pharmacy, String searchQuery) {
-    setState(() {
-      if (pharmacy.pharmacy_name.toLowerCase().contains(searchQuery) ||
-          pharmacy.pharmacy_name.contains(searchQuery)) {
-        filteredPharmacy.add(pharmacy);
-      }
-    });
   }
 
   filterList(Product country, String searchQuery) {
@@ -233,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen>
       ),
     ];
   }
-
 
     // List<User> pharmacies = [];
     var pharmacies;
@@ -273,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen>
       return users;
 
     }
+
  
 TabController controller;
  Widget appBarTitle = new Text("Pharmacy Locator");
@@ -284,6 +214,31 @@ Icon actionIcon = new Icon(Icons.search);
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
+        // title: appBarTitle,
+        // actions: <Widget>[
+        //   new IconButton(icon: actionIcon,onPressed:(){
+        //   setState(() {
+        //     if ( this.actionIcon.icon == Icons.search){
+        //     this.actionIcon = new Icon(Icons.close);
+        //     this.appBarTitle = new TextField(
+        //       style: new TextStyle(
+        //         color: Colors.white,
+
+        //       ),
+        //       decoration: new InputDecoration(
+        //         prefixIcon: new Icon(Icons.search,color: Colors.white),
+        //         hintText: "Search...",
+        //         hintStyle: new TextStyle(color: Colors.white)
+        //       ),
+        //     );}
+        //     else {
+        //       this.actionIcon = new Icon(Icons.search);
+        //       this.appBarTitle = new Text("Pharmacy Locator");
+        //     }
+
+
+        //   });
+        // } ,),],
         leading: _isSearching ? new BackButton( color: Colors.white,) : null,
         title: _isSearching ? _buildSearchField() : _buildTitle(context),
         actions: _buildActions(),
@@ -299,38 +254,34 @@ Icon actionIcon = new Icon(Icons.search);
         ),
       ),
 
-
-
       drawer: new Drawer(
-       
       child: ListView(
-        //  var size = MediaQuery.of(context).size;
         padding: EdgeInsets.zero,
         children: <Widget>[
-          
           DrawerHeader(
-            // child: Text(
-            //   'Pharmacy Locator',
-            //   style: TextStyle(color: Colors.indigoAccent, fontSize: 25, backgroundColor: Colors.white),
-            // ),
-            child: Stack(children: <Widget>[
-                Positioned(
-                    bottom: 12.0,
-                    left: 16.0,
-                    child: Text("Pharmacy Locator",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w500))),
-              ]),
+            child: Text(
+              'Side menu',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
             decoration: BoxDecoration(
                 color: Colors.green,
                 image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: AssetImage('assets/images/3.png'))),
-                    
+                    image: AssetImage('assets/images/prueleo1.png'))),
           ),
 
+          Container(
+              decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/3.png" ),
+                // fit: BoxFit.cover,
+                fit: BoxFit.fill,
+                
+                repeat: ImageRepeat.repeatY,
+              ),
+            ),
+            child: Column(
+              children: <Widget>[
                 ListTile(
                   leading: Icon(Icons.home, color: Colors.deepPurpleAccent),
                   title: Text('Home'),
@@ -363,8 +314,6 @@ Icon actionIcon = new Icon(Icons.search);
                   onTap: () => {Navigator.of(context).pop()},
                 ),
 
-                // _createDrawerItem(icon: Icons.face, text: 'Authors'),
-
                 ListTile(
                   leading: Icon(Icons.help, color: Colors.deepPurpleAccent),
                   title: Text('Help'),
@@ -373,9 +322,9 @@ Icon actionIcon = new Icon(Icons.search);
               ],
                           
             )
-          // ),
-        // ],
-      // ),
+          ),
+        ],
+      ),
     ),
 
       body: TabBarView(
@@ -389,27 +338,10 @@ Icon actionIcon = new Icon(Icons.search);
               : new Center(
                   child: new Text("No recored match!"),
                 ),
-                
-          filteredPharmacy != null && filteredPharmacy.length > 0
-          ? new PharmacyList(pharmacy: filteredPharmacy)
-          : allPharmacies == null
-              ? new Center(child: new CircularProgressIndicator())
-              : new Center(
-                  child: new Text("No recored match!"),
-                ),
-
           // MedicinePage(title: 'Medicine List'),
           // CountyList(product: filteredRecored),
-          // PHomePage(title: 'Pharmacies List'),
-          // HealthtipPage(title: 'Healthtips List'),
-
-          filteredCategory != null && filteredCategory.length > 0
-          ? new CategoryList(category: filteredCategory)
-          : allCategories == null
-              ? new Center(child: new CircularProgressIndicator())
-              : new Center(
-                  child: new Text("Category not found!"),
-                ),
+          PHomePage(title: 'Pharmacies List'),
+          HealthtipPage(title: 'Healthtips List'),
 
           
         ]),
@@ -418,9 +350,8 @@ Icon actionIcon = new Icon(Icons.search);
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Add your onPressed code here!
-            // print(filteredPharmacy);
             Navigator.push(context, 
-              new MaterialPageRoute(builder: (context) => MapHomePage())
+              new MaterialPageRoute(builder: (context) => HomePage(this.pharmacies))
             );
           },
           child: Icon(Icons.location_on),
@@ -429,20 +360,4 @@ Icon actionIcon = new Icon(Icons.search);
         ),
     );
   }
-
-  // Widget _createDrawerItem(
-  //     {IconData icon, String text, GestureTapCallback onTap}) {
-  //   return ListTile(
-  //     title: Row(
-  //       children: <Widget>[
-  //         Icon(icon, color: Colors.deepPurpleAccent,),
-  //         Padding(
-  //           padding: EdgeInsets.only(left: 8.0),
-  //           child: Text(text),
-  //         )
-  //       ],
-  //     ),
-  //     onTap: onTap,
-  //   );
-  // }
 }

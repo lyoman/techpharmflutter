@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:prueleo/search/medicine.dart';
+import 'package:prueleo/models/pharmacy_model.dart';
 
 
-class MedDetail extends StatelessWidget {
-  final Product user;
+class PharmDetailScreen extends StatelessWidget {
+  final User user;
 
-  MedDetail(this.user);
+  PharmDetailScreen(this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +15,11 @@ class MedDetail extends StatelessWidget {
       appBar: AppBar(
         title: Text(user.pharmacy_name),
       ),
+      // body: Padding(
+      //   padding: EdgeInsets.all(16.0),
+      //   child: Text(user.city),
+        
+      // ),
 
       body: Container(
         decoration: BoxDecoration(
@@ -32,9 +37,9 @@ class MedDetail extends StatelessWidget {
                       title: Text(user.pharmacy_name),
                       subtitle: Text(user.city),
                     ),
-                    Text(user.product_name),
-                    Text(user.productprice),
                     Text(user.address),
+                    Text(user.latitude),
+                    Text(user.longitude),
                     Text(user.location),
                   ],
                 ),

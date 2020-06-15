@@ -19,6 +19,7 @@ import 'package:prueleo/searchpharmacy/listpharmacy.dart';
 import 'package:prueleo/searchealthtips/listtips.dart';
 
 import 'package:prueleo/searchpharmacy/pharmmap.dart';
+import 'package:geolocator/geolocator.dart';
 
 // import 'package:prueleo/tabs/pharmacies_list.dart';
 // import 'package:prueleo/tabs/healthtips_list.dart';
@@ -45,9 +46,20 @@ class _HomeScreenState extends State<HomeScreen>
   List<Pharmacy> filteredPharmacy;
   List<TipCategory> filteredCategory;
 
+  double latitude, longitude;
+  // static LatLng _initialPosition;
+  void _getUserLocation() async {
+    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
+      this.latitude = position.latitude;
+      this.longitude = position.longitude;
+      print('${placemark[0].name}');
+  }
+
   @override
   void initState() {
     super.initState();
+    _getUserLocation();
     _searchQuery = new TextEditingController();
     fetchProduct(new http.Client()).then((String) {
       parseData(String);
@@ -326,7 +338,8 @@ Icon actionIcon = new Icon(Icons.search);
             decoration: BoxDecoration(
                 color: Colors.green,
                 image: DecorationImage(
-                    fit: BoxFit.fill,
+                    // fit: BoxFit.fill,
+                    repeat: ImageRepeat.repeatX,
                     image: AssetImage('assets/images/3.png'))),
                     
           ),
@@ -383,7 +396,7 @@ Icon actionIcon = new Icon(Icons.search);
         children: <Widget>[
 
           filteredRecored != null && filteredRecored.length > 0
-          ? new CountyList(product: filteredRecored)
+          ? new CountyList(product: filteredRecored, yolatitude: this.latitude, yolongitude: this.longitude,)
           : allRecord == null
               ? new Center(child: new CircularProgressIndicator())
               : new Center(
@@ -391,7 +404,7 @@ Icon actionIcon = new Icon(Icons.search);
                 ),
                 
           filteredPharmacy != null && filteredPharmacy.length > 0
-          ? new PharmacyList(pharmacy: filteredPharmacy)
+          ? new PharmacyList(pharmacy: filteredPharmacy, yolatitude: this.latitude, yolongitude: this.longitude,)
           : allPharmacies == null
               ? new Center(child: new CircularProgressIndicator())
               : new Center(

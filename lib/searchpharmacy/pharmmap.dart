@@ -6,16 +6,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:prueleo/models/pharmacy_model.dart';
-
-// import 'package:prueleo/searchpharmacy/pharmacy.dart';
+import 'dart:math' show cos, sqrt, asin;
 
 class MapHomePage extends StatefulWidget {
   @override
   HomePageState createState() => HomePageState();
-
-  // final List<Pharmacy> pharmacy;
-
-  // MapHomePage({Key key, this.pharmacy}) : super(key: key);
 
 }
 
@@ -81,6 +76,7 @@ class HomePageState extends State<MapHomePage> {
   }
 
   static LatLng _initialPosition;
+  static double latitude, longitude;
 
   @override
   void initState() {
@@ -95,15 +91,17 @@ class HomePageState extends State<MapHomePage> {
     List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
     setState(() {
       getAllPharmacies();
+      latitude = position.latitude;
+      longitude = position.longitude;
       _initialPosition = LatLng(position.latitude, position.longitude);
       print('${placemark[0].name}');
     });
     _markers.add(
         Marker(
-                markerId: MarkerId("Position"),
+                markerId: MarkerId("Current Position"),
                 // position: LatLng(-17.781340, 31.057491),
                 position: _initialPosition,
-                infoWindow: InfoWindow(title: "Your Current Position"),
+                infoWindow: InfoWindow(title: placemark[0].name + ", " + placemark[0].locality + ", " + placemark[0].country),
                 icon: BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueRed,
                 ),
@@ -111,7 +109,17 @@ class HomePageState extends State<MapHomePage> {
       );
   }
 
-    double zoomVal=14.0;
+  String calculateDistance(lat1, lon1, lat2, lon2){
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 - c((lat2 - lat1) * p)/2 + 
+          c(lat1 * p) * c(lat2 * p) * 
+          (1 - c((lon2 - lon1) * p))/2;
+          var answer = 12742 * asin(sqrt(a));
+    return answer.toStringAsFixed(2);
+  }
+
+  double zoomVal=15.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,7 +265,7 @@ class HomePageState extends State<MapHomePage> {
                           Container(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: myDetailsContainer1(restaurantName, location),
+                            child: myDetailsContainer1(restaurantName, location, lat, long),
                           ),
                         ),
 
@@ -268,7 +276,7 @@ class HomePageState extends State<MapHomePage> {
     );
   }
 
-  Widget myDetailsContainer1(String restaurantName, location) {
+  Widget myDetailsContainer1(String restaurantName, location, lat, long) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -343,10 +351,14 @@ class HomePageState extends State<MapHomePage> {
           SizedBox(height:5.0),
         Container(
                   child: Text(
-                location,
+                            location + " " + "("+
+                            calculateDistance( 
+                                latitude, longitude, lat, long
+                              ) + " km)",
                 style: TextStyle(
                   color: Colors.black54,
                   fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
                 ),
               )),
               SizedBox(height:5.0),

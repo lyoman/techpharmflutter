@@ -2,11 +2,46 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:prueleo/search/medicine.dart';
 import 'package:prueleo/search/medetail.dart';
+import 'dart:math' show cos, sqrt, asin, sin, acos, pi;
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geolocator/geolocator.dart';
 
 class CountyList extends StatelessWidget {
   final List<Product> product;
+  final double yolatitude, yolongitude;
+ 
 
-  CountyList({Key key, this.product}) : super(key: key);
+  CountyList({Key key, this.product, this.yolatitude, this.yolongitude}) : super(key: key);
+
+  String calculateDistance(lat1, lon1, lat2, lon2){
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 - c((lat2 - lat1) * p)/2 + 
+          c(lat1 * p) * c(lat2 * p) * 
+          (1 - c((lon2 - lon1) * p))/2;
+          var answer = 12742 * asin(sqrt(a));
+    return answer.toStringAsFixed(2);
+  }
+
+  String distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) +
+        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
+        dist = acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;
+
+          return dist.toStringAsFixed(2);
+        }
+
+    double deg2rad(double deg) {
+      return (deg * pi / 180.0);
+    }
+
+    double rad2deg(double rad) {
+      return (rad * 180.0 / pi);
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -28,45 +63,23 @@ class CountyList extends StatelessWidget {
                                         product[index].address,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                        trailing: Text('\$ ' + product[index].productprice.toString()),
+                        // trailing: Text('\$ ' + product[index].productprice.toString()),
+                        trailing: (this.yolatitude != null && this.yolongitude != null) ? Text(calculateDistance(this.yolatitude, 
+                                                this.yolongitude, 
+                                                double.parse(product[index].latitude), 
+                                                double.parse(product[index].longitude)
+                                                ) + " km"
+                                                ) : Container(child: CircularProgressIndicator(value: 1.0,)),
 
                         onTap: () {
                           Navigator.push(context, 
-                            new MaterialPageRoute(builder: (context) => MedDetail(product[index]))
+                            new MaterialPageRoute(builder: (context) => MedDetail(product[index], this.yolatitude, this.yolongitude))
                           );
                         },
                       )
                     ],
                   ),
                 );
-                // new Card(
-
-                //   child: new Container(
-                //     child: new Center(
-                //         child: new Column(
-                //       // Stretch the cards in horizontal axis
-                //       crossAxisAlignment: CrossAxisAlignment.stretch,
-                //       children: <Widget>[
-
-                //         new Text(
-                //           // Read the name field value and set it in the Text widget
-                //           product[index].product_name,
-                //           // set some style to text
-                //           style: new TextStyle(
-                //               fontSize: 20.0, color: Colors.lightBlueAccent),
-                //         ),
-                //         new Text(
-                //           // Read the name field value and set it in the Text widget
-                //           "Capital:- " + product[index].city,
-                //           // set some style to text
-                //           style: new TextStyle(
-                //               fontSize: 20.0, color: Colors.amber),
-                //         ),
-                //       ],
-                //     )),
-                //     padding: const EdgeInsets.all(15.0),
-                //   ),
-                // );
 
         });
   }

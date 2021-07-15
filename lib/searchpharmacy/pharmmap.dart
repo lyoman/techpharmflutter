@@ -283,7 +283,7 @@ class HomePageState extends State<MapHomePage> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Container(
-              child: Text(restaurantName,
+              child: Text(restaurantName ?? '',
             style: TextStyle(
                 color: Color(0xff6200ee),
                 fontSize: 24.0,
@@ -351,9 +351,9 @@ class HomePageState extends State<MapHomePage> {
           SizedBox(height:5.0),
         Container(
                   child: Text(
-                            location + " " + "("+
+                            location ?? '' + " " + "("+
                             calculateDistance( 
-                                latitude, longitude, lat, long
+                                latitude, longitude, lat ?? '', long ?? ''
                               ) + " km)",
                 style: TextStyle(
                   color: Colors.black54,

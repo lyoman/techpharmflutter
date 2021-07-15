@@ -51,16 +51,16 @@ class PharmacyList extends StatelessWidget {
                           radius: 30,
                           backgroundColor: Colors.white,
                           backgroundImage: NetworkImage(pharmacy[index].pharmacy_logo)),
-                        title: Text(pharmacy[index].pharmacy_name),
-                        subtitle: Text( pharmacy[index].location + ", " +
-                                        pharmacy[index].address + ", " +
-                                        pharmacy[index].city,
+                        title: Text(pharmacy[index].pharmacy_name ?? 'No Pharmacy Name'),
+                        subtitle: Text( pharmacy[index].location ?? 'No Location found!' + ", " +
+                                        pharmacy[index].address ?? 'No Address Found!' + ", " +
+                                        pharmacy[index].city ?? 'No City Found!',
                                         overflow: TextOverflow.ellipsis,
                                       ),
                         trailing: (this.yolatitude != null && this.yolongitude != null) ? Text(calculateDistance( this.yolatitude, 
                                                           this.yolongitude, 
-                                                          double.parse(pharmacy[index].latitude), 
-                                                          double.parse(pharmacy[index].longitude)
+                                                          double.parse(pharmacy[index].latitude ?? ''), 
+                                                          double.parse(pharmacy[index].longitude ?? '')
                                                           ) + " km") : Text("..km"),
 
                         onTap: () {

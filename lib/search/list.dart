@@ -73,7 +73,7 @@ class CountyList extends StatelessWidget {
 
                         onTap: () {
                           Navigator.push(context, 
-                            new MaterialPageRoute(builder: (context) => MedDetail(product[index], this.yolatitude, this.yolongitude))
+                            new MaterialPageRoute(builder: (context) => MedDetail(product[index], this.yolatitude ?? 0.0, this.yolongitude ?? 0.0))
                           );
                         },
                       )
